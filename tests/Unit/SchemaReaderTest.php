@@ -36,7 +36,7 @@ class SchemaReaderTest extends TestCase
 
     public function test_it_reads_table_with_columns(): void
     {
-        Schema::create('posts', function ($table) {
+        Schema::create('posts', function ($table): void {
             $table->id();
             $table->string('title');
             $table->text('body');
@@ -57,12 +57,12 @@ class SchemaReaderTest extends TestCase
 
     public function test_it_reads_foreign_keys(): void
     {
-        Schema::create('users', function ($table) {
+        Schema::create('users', function ($table): void {
             $table->id();
             $table->string('name');
         });
 
-        Schema::create('posts', function ($table) {
+        Schema::create('posts', function ($table): void {
             $table->id();
             $table->foreignId('user_id')->constrained('users');
             $table->string('title');
@@ -80,12 +80,12 @@ class SchemaReaderTest extends TestCase
 
     public function test_it_excludes_configured_tables(): void
     {
-        Schema::create('migrations', function ($table) {
+        Schema::create('migrations', function ($table): void {
             $table->id();
             $table->string('migration');
         });
 
-        Schema::create('posts', function ($table) {
+        Schema::create('posts', function ($table): void {
             $table->id();
             $table->string('title');
         });
@@ -98,12 +98,12 @@ class SchemaReaderTest extends TestCase
 
     public function test_it_reads_multiple_tables(): void
     {
-        Schema::create('users', function ($table) {
+        Schema::create('users', function ($table): void {
             $table->id();
             $table->string('name');
         });
 
-        Schema::create('posts', function ($table) {
+        Schema::create('posts', function ($table): void {
             $table->id();
             $table->string('title');
         });
@@ -120,12 +120,12 @@ class SchemaReaderTest extends TestCase
         $excludedTables = config('er.excluded_tables');
 
         foreach ($excludedTables as $table) {
-            Schema::create($table, function ($table) {
+            Schema::create($table, function ($table): void {
                 $table->id();
             });
         }
 
-        Schema::create('products', function ($table) {
+        Schema::create('products', function ($table): void {
             $table->id();
             $table->string('name');
         });

@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace PaoloBellini\LaravelEr\Commands;
 
 use Illuminate\Console\Command;
+use PaoloBellini\LaravelEr\Renderers\MermaidRenderer;
+use PaoloBellini\LaravelEr\SchemaReader;
 
 final class GenerateErDiagramCommand extends Command
 {
@@ -12,13 +14,20 @@ final class GenerateErDiagramCommand extends Command
 
     protected $description = 'Generate an ER diagram from your database schema';
 
-    public function handle(): int
+    public function handle(SchemaReader $reader, MermaidRenderer $renderer): int
     {
         $this->info('Generating ER diagram...');
 
-        // TODO: the actual logic will go here
+        $schema = $reader->read();
+        $output = $renderer->render($schema);
 
-        $this->info('Done!');
+        /** @var string $outputPath */
+        $outputPath = config('er.output_path');
+        $path = $outputPath.'/er-diagram.md';
+
+        file_put_contents($path, "```mermaid\n{$output}```\n");
+
+        $this->info('ER diagram saved to '.$path);
 
         return self::SUCCESS;
     }
