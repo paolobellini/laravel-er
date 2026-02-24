@@ -6,11 +6,11 @@
         "illuminate/support": "^11.0|^12.0"
     },
     "require-dev": {
-        "laravel/pint": "^1.27",
-        "rector/rector": "^2.3",
-        "phpstan/phpstan": "^2.1",
-        "orchestra/testbench": "^10.9",
-        "pestphp/pest": "^4.4"
+        "laravel/pint": "^1.27.1",
+        "pestphp/pest": "^5.0.0",
+        "pestphp/pest-plugin-type-coverage": "^5.0.0",
+        "phpstan/phpstan": "^2.1.39",
+        "rector/rector": "^2.3.8"
     },
     "license": "MIT",
     "autoload": {
@@ -43,5 +43,21 @@
         }
     },
     "minimum-stability": "dev",
-    "prefer-stable": true
+    "prefer-stable": true,
+    "scripts": {
+        "lint": "pint",
+        "refactor": "rector",
+        "test:type-coverage": "pest --type-coverage --exactly=100",
+        "test:lint": "pint --test",
+        "test:unit": "pest --coverage --exactly=100",
+        "test:types": "phpstan",
+        "test:refactor": "rector --dry-run",
+        "test": [
+            "@test:lint",
+            "@test:type-coverage",
+            "@test:unit",
+            "@test:types",
+            "@test:refactor"
+        ]
+    }
 }
