@@ -1,0 +1,47 @@
+{
+    "name": "paolobellini/laravel-er",
+    "description": "Automatically generate ER diagrams and AI-ready schema documentation from your Laravel database and Eloquent models.",
+    "require": {
+        "php": "^8.2",
+        "illuminate/support": "^11.0|^12.0"
+    },
+    "require-dev": {
+        "laravel/pint": "^1.27",
+        "rector/rector": "^2.3",
+        "phpstan/phpstan": "^2.1",
+        "orchestra/testbench": "^10.9",
+        "pestphp/pest": "^4.4"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "PaoloBellini\\LaravelEr\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "PaoloBellini\\LaravelEr\\Tests\\": "tests/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Paolo Bellini",
+            "email": "paolo@bellini.one"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [
+                "PaoloBellini\\LaravelEr\\LaravelErServiceProvider"
+            ]
+        }
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
