@@ -20,5 +20,9 @@ class LaravelErServiceProvider extends ServiceProvider
                 __DIR__.'/../config/er.php' => config_path('er.php'),
             ], 'er-config');
         }
+
+        $this->commands([
+            Commands\GenerateErDiagramCommand::class,
+        ]);
     }
 }

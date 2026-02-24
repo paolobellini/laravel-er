@@ -35,6 +35,13 @@ class LaravelErTest extends TestCase
         $this->assertContains('sessions', $excludedTables);
     }
 
+    public function test_it_registers_commands(): void
+    {
+        $this->artisan('list')
+            ->expectsOutputToContain('er:generate')
+            ->assertSuccessful();
+    }
+
     public function test_config_is_publishable(): void
     {
         $publishable = ServiceProvider::pathsToPublish(
