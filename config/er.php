@@ -30,5 +30,4 @@ return [
         'jobs',
         'job_batches',
     ],
-
 ];
