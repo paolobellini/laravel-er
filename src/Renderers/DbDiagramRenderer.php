@@ -6,7 +6,7 @@ namespace PaoloBellini\LaravelEr\Renderers;
 
 use PaoloBellini\LaravelEr\Contracts\SchemaRenderer;
 
-final readonly class MermaidRenderer implements SchemaRenderer
+final readonly class DbDiagramRenderer implements SchemaRenderer
 {
     /**
      * @param  array<string, array{columns: array<int, array<string, mixed>>, foreignKeys: array<int, array<string, mixed>>}>  $schema
