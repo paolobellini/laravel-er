@@ -39,9 +39,9 @@ class MermaidRendererTest extends TestCase
         $output = $this->renderer->render($schema);
 
         $this->assertStringContainsString('users {', $output);
-        $this->assertStringContainsString('integer id PK', $output);
-        $this->assertStringContainsString('varchar name', $output);
-        $this->assertStringContainsString('varchar email', $output);
+        $this->assertStringContainsString('integer id PK "not null"', $output);
+        $this->assertStringContainsString('varchar name "not null"', $output);
+        $this->assertStringContainsString('varchar email "not null"', $output);
     }
 
     public function test_it_marks_id_as_primary_key(): void
@@ -57,7 +57,7 @@ class MermaidRendererTest extends TestCase
 
         $output = $this->renderer->render($schema);
 
-        $this->assertStringContainsString('integer id PK', $output);
+        $this->assertStringContainsString('integer id PK "not null"', $output);
     }
 
     public function test_it_marks_uuid_as_primary_key(): void
@@ -73,7 +73,7 @@ class MermaidRendererTest extends TestCase
 
         $output = $this->renderer->render($schema);
 
-        $this->assertStringContainsString('char uuid PK', $output);
+        $this->assertStringContainsString('char uuid PK "not null"', $output);
     }
 
     public function test_it_marks_nullable_columns(): void
@@ -90,8 +90,8 @@ class MermaidRendererTest extends TestCase
 
         $output = $this->renderer->render($schema);
 
-        $this->assertStringContainsString('text bio nullable', $output);
-        $this->assertStringNotContainsString('integer id nullable', $output);
+        $this->assertStringContainsString('text bio "nullable"', $output);
+        $this->assertStringContainsString('integer id PK "not null"', $output);
     }
 
     public function test_it_combines_pk_and_nullable_attributes(): void
@@ -107,7 +107,7 @@ class MermaidRendererTest extends TestCase
 
         $output = $this->renderer->render($schema);
 
-        $this->assertStringContainsString('integer id PK,nullable', $output);
+        $this->assertStringContainsString('integer id PK "nullable"', $output);
     }
 
     public function test_it_renders_foreign_key_relationships(): void
@@ -171,6 +171,6 @@ class MermaidRendererTest extends TestCase
 
         $output = $this->renderer->render($schema);
 
-        $this->assertMatchesRegularExpression('/varchar name\s*$/m', $output, 'Regular column should have no trailing attributes');
+        $this->assertStringContainsString('varchar name "not null"', $output);
     }
 }

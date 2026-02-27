@@ -17,12 +17,23 @@ final readonly class MermaidRenderer
             $lines[] = '';
             $lines[] = sprintf('    %s {', $tableName);
 
+            $foreignKeyColumns = array_map(
+                static function (array $fk): string {
+                    /** @var array<int, string> $columns */
+                    $columns = $fk['columns'];
+
+                    return $columns[0];
+                },
+                $tableData['foreignKeys'],
+            );
+
             foreach ($tableData['columns'] as $column) {
                 /** @var string $typeName */
                 $typeName = $column['type_name'];
                 /** @var string $name */
                 $name = $column['name'];
-                $lines[] = sprintf('        %s %s', $typeName, $name).$this->getColumnAttributes($column);
+                $isFk = in_array($name, $foreignKeyColumns, true);
+                $lines[] = sprintf('        %s %s', $typeName, $name).$this->getColumnAttributes($column, $isFk);
             }
 
             $lines[] = '    }';
@@ -44,22 +55,26 @@ final readonly class MermaidRenderer
     /**
      * @param  array<string, mixed>  $column
      */
-    private function getColumnAttributes(array $column): string
+    private function getColumnAttributes(array $column, bool $isFk): string
     {
-        $attributes = [];
+        $parts = [];
 
         if (in_array($column['name'], ['id', 'uuid'])) {
-            $attributes[] = 'PK';
+            $parts[] = 'PK';
         }
 
-        if ($column['nullable']) {
-            $attributes[] = 'nullable';
+        if ($isFk) {
+            $parts[] = 'FK';
         }
 
-        if ($attributes !== []) {
-            return ' '.implode(',', $attributes);
+        $comment = $column['nullable'] ? 'nullable' : 'not null';
+
+        $result = '';
+
+        if ($parts !== []) {
+            $result .= ' '.implode(',', $parts);
         }
 
-        return '';
+        return $result.sprintf(' "%s"', $comment);
     }
 }
