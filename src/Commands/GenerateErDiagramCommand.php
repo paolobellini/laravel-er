@@ -5,27 +5,28 @@ declare(strict_types=1);
 namespace PaoloBellini\LaravelEr\Commands;
 
 use Illuminate\Console\Command;
-use PaoloBellini\LaravelEr\Renderers\MermaidRenderer;
-use PaoloBellini\LaravelEr\SchemaReader;
+use Illuminate\Contracts\Console\Isolatable;
+use PaoloBellini\LaravelEr\Context;
+use PaoloBellini\LaravelEr\Contracts\SchemaRenderer;
 
-final class GenerateErDiagramCommand extends Command
+final class GenerateErDiagramCommand extends Command implements Isolatable
 {
-    protected $signature = 'er:generate';
+    protected $signature = 'er:generate {--format= : The output format (mermaid, dbdiagram)}';
 
     protected $description = 'Generate an ER diagram from your database schema';
 
-    public function handle(SchemaReader $reader, MermaidRenderer $renderer): int
+    public function handle(Context $context): int
     {
         $this->info('Generating ER diagram...');
 
-        $schema = $reader->read();
-        $output = $renderer->render($schema);
+        /** @var string $format */
+        $format = $this->option('format') ?? config('er.renderer');
+        /** @var class-string<SchemaRenderer> $rendererClass */
+        $rendererClass = config('er.renderers.'.$format);
 
-        /** @var string $outputPath */
-        $outputPath = config('er.output_path');
-        $path = $outputPath.'/er-diagram.md';
+        $context->setStrategy(new $rendererClass);
 
-        file_put_contents($path, "```mermaid\n{$output}```\n");
+        $path = $context->executeStrategy();
 
         $this->info('ER diagram saved to '.$path);
 

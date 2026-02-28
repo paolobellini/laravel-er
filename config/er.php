@@ -1,5 +1,8 @@
 <?php
 
+use PaoloBellini\LaravelEr\Renderers\DbDiagramRenderer;
+use PaoloBellini\LaravelEr\Renderers\MermaidRenderer;
+
 return [
 
     /*
@@ -29,5 +32,11 @@ return [
         'cache_locks',
         'jobs',
         'job_batches',
+    ],
+
+    'renderer' => 'mermaid',
+    'renderers' => [
+        'mermaid' => MermaidRenderer::class,
+        'dbdiagram' => DbDiagramRenderer::class,
     ],
 ];
