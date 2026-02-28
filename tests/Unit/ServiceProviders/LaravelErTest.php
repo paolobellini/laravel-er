@@ -1,55 +1,44 @@
 <?php
 
-namespace PaoloBellini\LaravelEr\Tests\Unit\ServiceProviders;
-
 use Illuminate\Support\ServiceProvider;
 use PaoloBellini\LaravelEr\LaravelErServiceProvider;
-use PaoloBellini\LaravelEr\Tests\TestCase;
 
-class LaravelErTest extends TestCase
-{
-    public function test_it_is_registered(): void
-    {
-        $this->assertArrayHasKey(
-            LaravelErServiceProvider::class,
-            $this->app->getLoadedProviders()
-        );
-    }
+it('is registered', function (): void {
+    expect($this->app->getLoadedProviders())
+        ->toHaveKey(LaravelErServiceProvider::class);
+});
 
-    public function test_it_merges_config(): void
-    {
-        $config = config('er');
+it('merges config', function (): void {
+    $config = config('er');
 
-        $this->assertIsArray($config);
-        $this->assertArrayHasKey('output_path', $config);
-        $this->assertArrayHasKey('excluded_tables', $config);
-    }
+    expect($config)
+        ->toBeArray()
+        ->toHaveKey('output_path')
+        ->toHaveKey('excluded_tables');
+});
 
-    public function test_it_has_default_excluded_tables(): void
-    {
-        $excludedTables = config('er.excluded_tables');
+it('has default excluded tables', function (): void {
+    $excludedTables = config('er.excluded_tables');
 
-        $this->assertIsArray($excludedTables);
-        $this->assertContains('migrations', $excludedTables);
-        $this->assertContains('failed_jobs', $excludedTables);
-        $this->assertContains('sessions', $excludedTables);
-    }
+    expect($excludedTables)
+        ->toBeArray()
+        ->toContain('migrations')
+        ->toContain('failed_jobs')
+        ->toContain('sessions');
+});
 
-    public function test_it_registers_commands(): void
-    {
-        $this->artisan('list')
-            ->expectsOutputToContain('er:generate')
-            ->assertSuccessful();
-    }
+it('registers commands', function (): void {
+    $this->artisan('list')
+        ->expectsOutputToContain('er:generate')
+        ->assertSuccessful();
+});
 
-    public function test_config_is_publishable(): void
-    {
-        $publishable = ServiceProvider::pathsToPublish(
-            LaravelErServiceProvider::class,
-            'er-config'
-        );
+it('config is publishable', function (): void {
+    $publishable = ServiceProvider::pathsToPublish(
+        LaravelErServiceProvider::class,
+        'er-config'
+    );
 
-        $this->assertNotEmpty($publishable);
-        $this->assertStringEndsWith('config/er.php', array_key_first($publishable));
-    }
-}
+    expect($publishable)->not->toBeEmpty()
+        ->and(array_key_first($publishable))->toEndWith('config/er.php');
+});

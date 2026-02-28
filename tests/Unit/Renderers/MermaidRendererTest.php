@@ -1,176 +1,159 @@
 <?php
 
-namespace PaoloBellini\LaravelEr\Tests\Unit\Renderers;
-
 use PaoloBellini\LaravelEr\Renderers\MermaidRenderer;
-use PHPUnit\Framework\TestCase;
 
-class MermaidRendererTest extends TestCase
-{
-    private MermaidRenderer $renderer;
+beforeEach(function (): void {
+    $this->renderer = new MermaidRenderer;
+});
 
-    protected function setUp(): void
-    {
-        parent::setUp();
+it('renders empty schema', function (): void {
+    $output = $this->renderer->render([]);
 
-        $this->renderer = new MermaidRenderer;
-    }
+    expect($output)->toContain('erDiagram');
+});
 
-    public function test_it_renders_empty_schema(): void
-    {
-        $output = $this->renderer->render([]);
-
-        $this->assertStringContainsString('erDiagram', $output);
-    }
-
-    public function test_it_renders_table_with_columns(): void
-    {
-        $schema = [
-            'users' => [
-                'columns' => [
-                    ['name' => 'id', 'type_name' => 'integer', 'nullable' => false],
-                    ['name' => 'name', 'type_name' => 'varchar', 'nullable' => false],
-                    ['name' => 'email', 'type_name' => 'varchar', 'nullable' => false],
-                ],
-                'foreignKeys' => [],
+it('renders table with columns', function (): void {
+    $schema = [
+        'users' => [
+            'columns' => [
+                ['name' => 'id', 'type_name' => 'integer', 'nullable' => false],
+                ['name' => 'name', 'type_name' => 'varchar', 'nullable' => false],
+                ['name' => 'email', 'type_name' => 'varchar', 'nullable' => false],
             ],
-        ];
+            'foreignKeys' => [],
+        ],
+    ];
 
-        $output = $this->renderer->render($schema);
+    $output = $this->renderer->render($schema);
 
-        $this->assertStringContainsString('users {', $output);
-        $this->assertStringContainsString('integer id PK "not null"', $output);
-        $this->assertStringContainsString('varchar name "not null"', $output);
-        $this->assertStringContainsString('varchar email "not null"', $output);
-    }
+    expect($output)
+        ->toContain('users {')
+        ->toContain('integer id PK "not null"')
+        ->toContain('varchar name "not null"')
+        ->toContain('varchar email "not null"');
+});
 
-    public function test_it_marks_id_as_primary_key(): void
-    {
-        $schema = [
-            'posts' => [
-                'columns' => [
-                    ['name' => 'id', 'type_name' => 'integer', 'nullable' => false],
-                ],
-                'foreignKeys' => [],
+it('marks id as primary key', function (): void {
+    $schema = [
+        'posts' => [
+            'columns' => [
+                ['name' => 'id', 'type_name' => 'integer', 'nullable' => false],
             ],
-        ];
+            'foreignKeys' => [],
+        ],
+    ];
 
-        $output = $this->renderer->render($schema);
+    $output = $this->renderer->render($schema);
 
-        $this->assertStringContainsString('integer id PK "not null"', $output);
-    }
+    expect($output)->toContain('integer id PK "not null"');
+});
 
-    public function test_it_marks_uuid_as_primary_key(): void
-    {
-        $schema = [
-            'orders' => [
-                'columns' => [
-                    ['name' => 'uuid', 'type_name' => 'char', 'nullable' => false],
-                ],
-                'foreignKeys' => [],
+it('marks uuid as primary key', function (): void {
+    $schema = [
+        'orders' => [
+            'columns' => [
+                ['name' => 'uuid', 'type_name' => 'char', 'nullable' => false],
             ],
-        ];
+            'foreignKeys' => [],
+        ],
+    ];
 
-        $output = $this->renderer->render($schema);
+    $output = $this->renderer->render($schema);
 
-        $this->assertStringContainsString('char uuid PK "not null"', $output);
-    }
+    expect($output)->toContain('char uuid PK "not null"');
+});
 
-    public function test_it_marks_nullable_columns(): void
-    {
-        $schema = [
-            'profiles' => [
-                'columns' => [
-                    ['name' => 'id', 'type_name' => 'integer', 'nullable' => false],
-                    ['name' => 'bio', 'type_name' => 'text', 'nullable' => true],
-                ],
-                'foreignKeys' => [],
+it('marks nullable columns', function (): void {
+    $schema = [
+        'profiles' => [
+            'columns' => [
+                ['name' => 'id', 'type_name' => 'integer', 'nullable' => false],
+                ['name' => 'bio', 'type_name' => 'text', 'nullable' => true],
             ],
-        ];
+            'foreignKeys' => [],
+        ],
+    ];
 
-        $output = $this->renderer->render($schema);
+    $output = $this->renderer->render($schema);
 
-        $this->assertStringContainsString('text bio "nullable"', $output);
-        $this->assertStringContainsString('integer id PK "not null"', $output);
-    }
+    expect($output)
+        ->toContain('text bio "nullable"')
+        ->toContain('integer id PK "not null"');
+});
 
-    public function test_it_combines_pk_and_nullable_attributes(): void
-    {
-        $schema = [
-            'items' => [
-                'columns' => [
-                    ['name' => 'id', 'type_name' => 'integer', 'nullable' => true],
-                ],
-                'foreignKeys' => [],
+it('combines pk and nullable attributes', function (): void {
+    $schema = [
+        'items' => [
+            'columns' => [
+                ['name' => 'id', 'type_name' => 'integer', 'nullable' => true],
             ],
-        ];
+            'foreignKeys' => [],
+        ],
+    ];
 
-        $output = $this->renderer->render($schema);
+    $output = $this->renderer->render($schema);
 
-        $this->assertStringContainsString('integer id PK "nullable"', $output);
-    }
+    expect($output)->toContain('integer id PK "nullable"');
+});
 
-    public function test_it_renders_foreign_key_relationships(): void
-    {
-        $schema = [
-            'users' => [
-                'columns' => [
-                    ['name' => 'id', 'type_name' => 'integer', 'nullable' => false],
-                ],
-                'foreignKeys' => [],
+it('renders foreign key relationships', function (): void {
+    $schema = [
+        'users' => [
+            'columns' => [
+                ['name' => 'id', 'type_name' => 'integer', 'nullable' => false],
             ],
-            'posts' => [
-                'columns' => [
-                    ['name' => 'id', 'type_name' => 'integer', 'nullable' => false],
-                    ['name' => 'user_id', 'type_name' => 'integer', 'nullable' => false],
-                ],
-                'foreignKeys' => [
-                    ['foreign_table' => 'users', 'columns' => ['user_id']],
-                ],
+            'foreignKeys' => [],
+        ],
+        'posts' => [
+            'columns' => [
+                ['name' => 'id', 'type_name' => 'integer', 'nullable' => false],
+                ['name' => 'user_id', 'type_name' => 'integer', 'nullable' => false],
             ],
-        ];
-
-        $output = $this->renderer->render($schema);
-
-        $this->assertStringContainsString('users ||--o{ posts : "has many"', $output);
-    }
-
-    public function test_it_renders_multiple_tables(): void
-    {
-        $schema = [
-            'users' => [
-                'columns' => [
-                    ['name' => 'id', 'type_name' => 'integer', 'nullable' => false],
-                ],
-                'foreignKeys' => [],
+            'foreignKeys' => [
+                ['foreign_table' => 'users', 'columns' => ['user_id']],
             ],
-            'posts' => [
-                'columns' => [
-                    ['name' => 'id', 'type_name' => 'integer', 'nullable' => false],
-                ],
-                'foreignKeys' => [],
+        ],
+    ];
+
+    $output = $this->renderer->render($schema);
+
+    expect($output)->toContain('users ||--o{ posts : "has many"');
+});
+
+it('renders multiple tables', function (): void {
+    $schema = [
+        'users' => [
+            'columns' => [
+                ['name' => 'id', 'type_name' => 'integer', 'nullable' => false],
             ],
-        ];
-
-        $output = $this->renderer->render($schema);
-
-        $this->assertStringContainsString('users {', $output);
-        $this->assertStringContainsString('posts {', $output);
-    }
-
-    public function test_regular_column_has_no_attributes(): void
-    {
-        $schema = [
-            'tags' => [
-                'columns' => [
-                    ['name' => 'name', 'type_name' => 'varchar', 'nullable' => false],
-                ],
-                'foreignKeys' => [],
+            'foreignKeys' => [],
+        ],
+        'posts' => [
+            'columns' => [
+                ['name' => 'id', 'type_name' => 'integer', 'nullable' => false],
             ],
-        ];
+            'foreignKeys' => [],
+        ],
+    ];
 
-        $output = $this->renderer->render($schema);
+    $output = $this->renderer->render($schema);
 
-        $this->assertStringContainsString('varchar name "not null"', $output);
-    }
-}
+    expect($output)
+        ->toContain('users {')
+        ->toContain('posts {');
+});
+
+it('regular column has no attributes', function (): void {
+    $schema = [
+        'tags' => [
+            'columns' => [
+                ['name' => 'name', 'type_name' => 'varchar', 'nullable' => false],
+            ],
+            'foreignKeys' => [],
+        ],
+    ];
+
+    $output = $this->renderer->render($schema);
+
+    expect($output)->toContain('varchar name "not null"');
+});

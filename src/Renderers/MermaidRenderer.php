@@ -28,9 +28,8 @@ final readonly class MermaidRenderer
             );
 
             foreach ($tableData['columns'] as $column) {
-                /** @var string $rawType */
-                $rawType = $column['type_name'];
-                $typeName = $this->normalizeType($rawType);
+                /** @var string $typeName */
+                $typeName = $column['type_name'];
                 /** @var string $name */
                 $name = $column['name'];
                 $isFk = in_array($name, $foreignKeyColumns, true);
@@ -51,14 +50,6 @@ final readonly class MermaidRenderer
         }
 
         return implode("\n", $lines)."\n";
-    }
-
-    private function normalizeType(string $type): string
-    {
-        return match ($type) {
-            'uuid', 'ulid' => 'varchar',
-            default => $type,
-        };
     }
 
     /**

@@ -6,8 +6,10 @@
         "illuminate/support": "^11.0|^12.0"
     },
     "require-dev": {
-        "orchestra/testbench": "^8.1|^9.1|^10.0",
         "laravel/pint": "^1.27.1",
+        "orchestra/testbench": "^8.1|^9.1|^10.0",
+        "pestphp/pest": "^3.8",
+        "pestphp/pest-plugin-type-coverage": "^3.6",
         "phpstan/phpstan": "^2.1.39",
         "phpunit/phpunit": "^10.5|^11.0",
         "rector/rector": "^2.3.8"
@@ -47,12 +49,14 @@
     "scripts": {
         "lint": "pint",
         "refactor": "rector",
+        "test:type-coverage": "pest --type-coverage --exactly=100",
         "test:lint": "pint --test",
-        "test:unit": "vendor/bin/phpunit",
+        "test:unit": "pest --coverage --exactly=100",
         "test:types": "phpstan",
         "test:refactor": "rector --dry-run",
         "test": [
             "@test:lint",
+            "@test:type-coverage",
             "@test:unit",
             "@test:types",
             "@test:refactor"
