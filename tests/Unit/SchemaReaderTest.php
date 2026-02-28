@@ -1,141 +1,123 @@
 <?php
 
-namespace PaoloBellini\LaravelEr\Tests\Unit;
-
 use Illuminate\Support\Facades\Schema;
 use PaoloBellini\LaravelEr\SchemaReader;
-use PaoloBellini\LaravelEr\Tests\TestCase;
 
-class SchemaReaderTest extends TestCase
-{
-    private SchemaReader $reader;
+beforeEach(function (): void {
+    $this->app['config']->set('database.default', 'testing');
+    $this->app['config']->set('database.connections.testing', [
+        'driver' => 'sqlite',
+        'database' => ':memory:',
+    ]);
 
-    protected function setUp(): void
-    {
-        parent::setUp();
+    $this->reader = new SchemaReader;
+});
 
-        $this->reader = new SchemaReader;
+it('returns empty schema when no tables exist', function (): void {
+    $schema = $this->reader->read();
+
+    expect($schema)->toBeArray()->toBeEmpty();
+});
+
+it('reads table with columns', function (): void {
+    Schema::create('posts', function ($table): void {
+        $table->id();
+        $table->string('title');
+        $table->text('body');
+        $table->timestamps();
+    });
+
+    $schema = $this->reader->read();
+
+    expect($schema)
+        ->toHaveKey('posts')
+        ->and($schema['posts'])->toHaveKey('columns')
+        ->and($schema['posts']['columns'])->not->toBeEmpty();
+
+    $columnNames = array_column($schema['posts']['columns'], 'name');
+    expect($columnNames)
+        ->toContain('id')
+        ->toContain('title')
+        ->toContain('body');
+});
+
+it('reads foreign keys', function (): void {
+    Schema::create('users', function ($table): void {
+        $table->id();
+        $table->string('name');
+    });
+
+    Schema::create('posts', function ($table): void {
+        $table->id();
+        $table->foreignId('user_id')->constrained('users');
+        $table->string('title');
+    });
+
+    $schema = $this->reader->read();
+
+    expect($schema['posts']['foreignKeys'])->not->toBeEmpty();
+
+    $fk = $schema['posts']['foreignKeys'][0];
+    expect($fk['foreign_table'])->toBe('users')
+        ->and($fk['columns'])->toContain('user_id');
+});
+
+it('excludes configured tables', function (): void {
+    Schema::create('migrations', function ($table): void {
+        $table->id();
+        $table->string('migration');
+    });
+
+    Schema::create('posts', function ($table): void {
+        $table->id();
+        $table->string('title');
+    });
+
+    $schema = $this->reader->read();
+
+    expect($schema)
+        ->not->toHaveKey('migrations')
+        ->toHaveKey('posts');
+});
+
+it('reads multiple tables', function (): void {
+    Schema::create('users', function ($table): void {
+        $table->id();
+        $table->string('name');
+    });
+
+    Schema::create('posts', function ($table): void {
+        $table->id();
+        $table->string('title');
+    });
+
+    $schema = $this->reader->read();
+
+    expect($schema)
+        ->toHaveKey('users')
+        ->toHaveKey('posts')
+        ->toHaveCount(2);
+});
+
+it('excludes all default excluded tables', function (): void {
+    $excludedTables = config('er.excluded_tables');
+
+    foreach ($excludedTables as $table) {
+        Schema::create($table, function ($table): void {
+            $table->id();
+        });
     }
 
-    protected function defineEnvironment($app): void
-    {
-        $app['config']->set('database.default', 'testing');
-        $app['config']->set('database.connections.testing', [
-            'driver' => 'sqlite',
-            'database' => ':memory:',
-        ]);
+    Schema::create('products', function ($table): void {
+        $table->id();
+        $table->string('name');
+    });
+
+    $schema = $this->reader->read();
+
+    foreach ($excludedTables as $table) {
+        expect($schema)->not->toHaveKey($table);
     }
 
-    public function test_it_returns_empty_schema_when_no_tables_exist(): void
-    {
-        $schema = $this->reader->read();
-
-        $this->assertIsArray($schema);
-        $this->assertEmpty($schema);
-    }
-
-    public function test_it_reads_table_with_columns(): void
-    {
-        Schema::create('posts', function ($table): void {
-            $table->id();
-            $table->string('title');
-            $table->text('body');
-            $table->timestamps();
-        });
-
-        $schema = $this->reader->read();
-
-        $this->assertArrayHasKey('posts', $schema);
-        $this->assertArrayHasKey('columns', $schema['posts']);
-        $this->assertNotEmpty($schema['posts']['columns']);
-
-        $columnNames = array_column($schema['posts']['columns'], 'name');
-        $this->assertContains('id', $columnNames);
-        $this->assertContains('title', $columnNames);
-        $this->assertContains('body', $columnNames);
-    }
-
-    public function test_it_reads_foreign_keys(): void
-    {
-        Schema::create('users', function ($table): void {
-            $table->id();
-            $table->string('name');
-        });
-
-        Schema::create('posts', function ($table): void {
-            $table->id();
-            $table->foreignId('user_id')->constrained('users');
-            $table->string('title');
-        });
-
-        $schema = $this->reader->read();
-
-        $this->assertArrayHasKey('foreignKeys', $schema['posts']);
-        $this->assertNotEmpty($schema['posts']['foreignKeys']);
-
-        $fk = $schema['posts']['foreignKeys'][0];
-        $this->assertEquals('users', $fk['foreign_table']);
-        $this->assertContains('user_id', $fk['columns']);
-    }
-
-    public function test_it_excludes_configured_tables(): void
-    {
-        Schema::create('migrations', function ($table): void {
-            $table->id();
-            $table->string('migration');
-        });
-
-        Schema::create('posts', function ($table): void {
-            $table->id();
-            $table->string('title');
-        });
-
-        $schema = $this->reader->read();
-
-        $this->assertArrayNotHasKey('migrations', $schema);
-        $this->assertArrayHasKey('posts', $schema);
-    }
-
-    public function test_it_reads_multiple_tables(): void
-    {
-        Schema::create('users', function ($table): void {
-            $table->id();
-            $table->string('name');
-        });
-
-        Schema::create('posts', function ($table): void {
-            $table->id();
-            $table->string('title');
-        });
-
-        $schema = $this->reader->read();
-
-        $this->assertArrayHasKey('users', $schema);
-        $this->assertArrayHasKey('posts', $schema);
-        $this->assertCount(2, $schema);
-    }
-
-    public function test_it_excludes_all_default_excluded_tables(): void
-    {
-        $excludedTables = config('er.excluded_tables');
-
-        foreach ($excludedTables as $table) {
-            Schema::create($table, function ($table): void {
-                $table->id();
-            });
-        }
-
-        Schema::create('products', function ($table): void {
-            $table->id();
-            $table->string('name');
-        });
-
-        $schema = $this->reader->read();
-
-        foreach ($excludedTables as $table) {
-            $this->assertArrayNotHasKey($table, $schema);
-        }
-
-        $this->assertArrayHasKey('products', $schema);
-    }
-}
+    expect($schema)->toHaveKey('products');
+});
