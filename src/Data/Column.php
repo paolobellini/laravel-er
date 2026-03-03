@@ -8,7 +8,7 @@ final readonly class Column
 {
     public function __construct(
         public string $name,
-        public string $typeName,
+        public string $type,
         public bool $nullable,
         public ?string $default,
     ) {}

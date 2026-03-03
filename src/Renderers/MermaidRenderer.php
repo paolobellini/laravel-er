@@ -42,7 +42,7 @@ final class MermaidRenderer extends AbstractRenderer
     private function renderColumn(Column $column, Table $table): string
     {
         $parts = array_filter([
-            sprintf('        %s %s', $column->typeName, $column->name),
+            sprintf('        %s %s', $column->type, $column->name),
             $this->columnAttributes($column, $table),
             '"'.$this->columnComment($column).'"',
         ]);

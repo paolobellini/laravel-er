@@ -25,7 +25,7 @@ final readonly class SchemaReader
             ->unique()
             ->reject(fn (string $table): bool => in_array($table, $excluded))
             ->map(function (string $tableName): Table {
-                /** @var list<array{name: string, type_name: string, nullable: bool, default: string|null}> $rawColumns */
+                /** @var list<array{name: string, type: string, nullable: bool, default: string|null}> $rawColumns */
                 $rawColumns = Schema::getColumns($tableName);
                 /** @var list<array{columns: list<string>, foreign_table: string}> $rawForeignKeys */
                 $rawForeignKeys = Schema::getForeignKeys($tableName);
@@ -37,7 +37,7 @@ final readonly class SchemaReader
                     columns: array_map(
                         fn (array $col): Column => new Column(
                             name: $col['name'],
-                            typeName: $col['type_name'],
+                            type: $col['type'],
                             nullable: $col['nullable'],
                             default: $col['default'],
                         ),
