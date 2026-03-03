@@ -16,9 +16,9 @@ final class MermaidRenderer extends AbstractRenderer
         return 'erDiagram';
     }
 
-    public function wrapOutput(): string
+    public function wrapOutput(string $content): string
     {
-        return "```mermaid\n%s\n```\n";
+        return "```mermaid\n{$content}\n```\n";
     }
 
     public function outputExtension(): string

@@ -23,9 +23,9 @@ it('renders with default empty header', function (): void {
             return '';
         }
 
-        public function wrapOutput(): string
+        public function wrapOutput(string $content): string
         {
-            return "---\n%s---\n";
+            return "---\n{$content}---\n";
         }
     };
 
@@ -54,9 +54,9 @@ it('returns raw content when wrapOutput is passthrough', function (): void {
             return '';
         }
 
-        public function wrapOutput(): string
+        public function wrapOutput(string $content): string
         {
-            return '%s';
+            return $content;
         }
     };
 

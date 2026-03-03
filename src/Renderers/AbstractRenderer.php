@@ -19,7 +19,7 @@ abstract class AbstractRenderer implements SchemaRenderer
             $this->renderRelationships($schema),
         ]);
 
-        return sprintf($this->wrapOutput(), implode("\n", $sections)."\n");
+        return $this->wrapOutput(implode("\n", $sections)."\n");
     }
 
     protected function renderHeader(): string

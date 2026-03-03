@@ -12,7 +12,7 @@ it('renders empty string', function (): void {
 });
 
 it('returns passthrough wrap output', function (): void {
-    expect($this->renderer->wrapOutput())->toBe('%s');
+    expect($this->renderer->wrapOutput('test'))->toBe('test');
 });
 
 it('returns dbml output extension', function (): void {

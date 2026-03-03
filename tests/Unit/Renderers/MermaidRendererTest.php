@@ -120,7 +120,7 @@ it('renders nullable columns correctly', function (): void {
 });
 
 it('returns markdown wrap output', function (): void {
-    expect($this->renderer->wrapOutput())->toBe("```mermaid\n%s\n```\n");
+    expect($this->renderer->wrapOutput("erDiagram\n"))->toBe("```mermaid\nerDiagram\n\n```\n");
 });
 
 it('returns md output extension', function (): void {

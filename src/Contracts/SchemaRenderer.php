@@ -10,5 +10,5 @@ interface SchemaRenderer
 
     public function outputExtension(): string;
 
-    public function wrapOutput(): string;
+    public function wrapOutput(string $content): string;
 }
