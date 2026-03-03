@@ -17,8 +17,6 @@ final class GenerateErDiagramCommand extends Command implements Isolatable
 
     public function handle(Context $context): int
     {
-        $this->info('Generating ER diagram...');
-
         /** @var string $format */
         $format = $this->option('format') ?? config('er.renderer');
         /** @var class-string<SchemaRenderer> $rendererClass */
@@ -26,9 +24,12 @@ final class GenerateErDiagramCommand extends Command implements Isolatable
 
         $context->setStrategy(new $rendererClass);
 
-        $path = $context->executeStrategy();
+        $path = '';
+        $this->components->task('Generating ER diagram', function () use ($context, &$path): void {
+            $path = $context->executeStrategy();
+        });
 
-        $this->info('ER diagram saved to '.$path);
+        $this->components->info(sprintf('ER diagram saved to [%s].', $path));
 
         return self::SUCCESS;
     }

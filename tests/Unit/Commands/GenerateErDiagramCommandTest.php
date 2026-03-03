@@ -24,7 +24,7 @@ it('outputs generating and saved messages', function (): void {
     });
 
     $this->artisan('er:generate')
-        ->expectsOutputToContain('Generating ER diagram...')
+        ->expectsOutputToContain('Generating ER diagram')
         ->expectsOutputToContain('ER diagram saved to')
         ->assertSuccessful();
 });
