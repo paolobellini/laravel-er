@@ -16,7 +16,7 @@ it('executes strategy for mermaid renderer', function (): void {
 
     $result = $this->context->executeStrategy();
 
-    expect($result)->toBe('mermaid path');
+    expect($result)->toBe("erDiagram\n");
 });
 
 it('executes strategy for dbdiagram renderer', function (): void {
