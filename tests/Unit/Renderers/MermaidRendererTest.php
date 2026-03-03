@@ -126,3 +126,33 @@ it('returns markdown wrap output', function (): void {
 it('returns md output extension', function (): void {
     expect($this->renderer->outputExtension())->toBe('md');
 });
+
+it('renders each table exactly once', function (): void {
+    $schema = new Schema([
+        new Table(
+            name: 'users',
+            columns: [new Column('id', 'integer')],
+            foreignKeys: [],
+            indexes: [],
+        ),
+        new Table(
+            name: 'posts',
+            columns: [new Column('id', 'integer')],
+            foreignKeys: [],
+            indexes: [],
+        ),
+        new Table(
+            name: 'comments',
+            columns: [new Column('id', 'integer')],
+            foreignKeys: [],
+            indexes: [],
+        ),
+    ]);
+
+    $output = $this->renderer->render($schema);
+
+    expect(substr_count((string) $output, 'users {'))->toBe(1)
+        ->and(substr_count((string) $output, 'posts {'))->toBe(1)
+        ->and(substr_count((string) $output, 'comments {'))->toBe(1)
+        ->and(substr_count((string) $output, 'erDiagram'))->toBe(1);
+});

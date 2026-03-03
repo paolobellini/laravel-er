@@ -22,6 +22,7 @@ final readonly class SchemaReader
 
         /** @var list<Table> $tables */
         $tables = collect($allSchemaTables)
+            ->unique()
             ->reject(fn (string $table): bool => in_array($table, $excluded))
             ->map(function (string $tableName): Table {
                 /** @var list<array{name: string, type_name: string, nullable: bool}> $rawColumns */
