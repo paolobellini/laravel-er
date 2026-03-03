@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace PaoloBellini\LaravelEr\Renderers;
 
 use PaoloBellini\LaravelEr\Contracts\SchemaRenderer;
+use PaoloBellini\LaravelEr\Data\ForeignKey;
+use PaoloBellini\LaravelEr\Data\Schema;
+use PaoloBellini\LaravelEr\Data\Table;
 
 abstract class AbstractRenderer implements SchemaRenderer
 {
-    /**
-     * @param  array<string, array{columns: array<int, array<string, mixed>>, foreignKeys: array<int, array<string, mixed>>, indexes: array<int, array<string, mixed>>}>  $schema
-     */
-    public function render(array $schema): string
+    public function render(Schema $schema): string
     {
         $sections = array_filter([
             $this->renderHeader(),
@@ -24,47 +24,34 @@ abstract class AbstractRenderer implements SchemaRenderer
 
     protected function renderHeader(): string
     {
-        return method_exists($this, 'header') ? $this->header() : '';
+        return '';
     }
 
-    /**
-     * @param  array<string, array{columns: array<int, array<string, mixed>>, foreignKeys: array<int, array<string, mixed>>, indexes: array<int, array<string, mixed>>}>  $schema
-     */
-    protected function renderTables(array $schema): string
+    protected function renderTables(Schema $schema): string
     {
         $lines = [];
 
-        foreach ($schema as $tableName => $tableData) {
-            $lines[] = $this->renderTable($tableName, $tableData);
+        foreach ($schema->tables as $table) {
+            $lines[] = $this->renderTable($table);
         }
 
         return implode("\n", $lines);
     }
 
-    /**
-     * @param  array<string, array{columns: array<int, array<string, mixed>>, foreignKeys: array<int, array<string, mixed>>, indexes: array<int, array<string, mixed>>}>  $schema
-     */
-    protected function renderRelationships(array $schema): string
+    protected function renderRelationships(Schema $schema): string
     {
         $lines = [];
 
-        foreach ($schema as $tableName => $tableData) {
-            foreach ($tableData['foreignKeys'] as $fk) {
-                $lines[] = $this->renderRelationship($tableName, $tableData, $fk);
+        foreach ($schema->tables as $table) {
+            foreach ($table->foreignKeys as $fk) {
+                $lines[] = $this->renderRelationship($table, $fk);
             }
         }
 
         return implode("\n", $lines);
     }
 
-    /**
-     * @param  array{columns: array<int, array<string, mixed>>, foreignKeys: array<int, array<string, mixed>>, indexes: array<int, array<string, mixed>>}  $tableData
-     */
-    abstract protected function renderTable(string $tableName, array $tableData): string;
+    abstract protected function renderTable(Table $table): string;
 
-    /**
-     * @param  array{columns: array<int, array<string, mixed>>, foreignKeys: array<int, array<string, mixed>>, indexes: array<int, array<string, mixed>>}  $tableData
-     * @param  array<string, mixed>  $fk
-     */
-    abstract protected function renderRelationship(string $tableName, array $tableData, array $fk): string;
+    abstract protected function renderRelationship(Table $table, ForeignKey $fk): string;
 }

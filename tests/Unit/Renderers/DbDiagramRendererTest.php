@@ -1,5 +1,6 @@
 <?php
 
+use PaoloBellini\LaravelEr\Data\Schema;
 use PaoloBellini\LaravelEr\Renderers\DbDiagramRenderer;
 
 beforeEach(function (): void {
@@ -7,7 +8,7 @@ beforeEach(function (): void {
 });
 
 it('renders empty string', function (): void {
-    expect($this->renderer->render([]))->toBe('dbdiagram path');
+    expect($this->renderer->render(new Schema([])))->toBe('dbdiagram path');
 });
 
 it('returns empty wrap output', function (): void {

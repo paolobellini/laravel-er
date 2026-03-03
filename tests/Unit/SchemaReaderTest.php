@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Schema;
+use PaoloBellini\LaravelEr\Data\Schema as SchemaData;
 use PaoloBellini\LaravelEr\SchemaReader;
 
 beforeEach(function (): void {
@@ -16,7 +17,9 @@ beforeEach(function (): void {
 it('returns empty schema when no tables exist', function (): void {
     $schema = $this->reader->read();
 
-    expect($schema)->toBeArray()->toBeEmpty();
+    expect($schema)
+        ->toBeInstanceOf(SchemaData::class)
+        ->and($schema->tables)->toBeEmpty();
 });
 
 it('reads table with columns', function (): void {
@@ -29,12 +32,11 @@ it('reads table with columns', function (): void {
 
     $schema = $this->reader->read();
 
-    expect($schema)
-        ->toHaveKey('posts')
-        ->and($schema['posts'])->toHaveKey('columns')
-        ->and($schema['posts']['columns'])->not->toBeEmpty();
+    expect($schema->tables)->toHaveCount(1)
+        ->and($schema->tables[0]->name)->toBe('posts')
+        ->and($schema->tables[0]->columns)->not->toBeEmpty();
 
-    $columnNames = array_column($schema['posts']['columns'], 'name');
+    $columnNames = array_map(fn ($col) => $col->name, $schema->tables[0]->columns);
     expect($columnNames)
         ->toContain('id')
         ->toContain('title')
@@ -55,11 +57,13 @@ it('reads foreign keys', function (): void {
 
     $schema = $this->reader->read();
 
-    expect($schema['posts']['foreignKeys'])->not->toBeEmpty();
+    $postsTable = collect($schema->tables)->first(fn ($t): bool => $t->name === 'posts');
 
-    $fk = $schema['posts']['foreignKeys'][0];
-    expect($fk['foreign_table'])->toBe('users')
-        ->and($fk['columns'])->toContain('user_id');
+    expect($postsTable->foreignKeys)->not->toBeEmpty();
+
+    $fk = $postsTable->foreignKeys[0];
+    expect($fk->foreignTable)->toBe('users')
+        ->and($fk->columns)->toContain('user_id');
 });
 
 it('excludes configured tables', function (): void {
@@ -75,9 +79,10 @@ it('excludes configured tables', function (): void {
 
     $schema = $this->reader->read();
 
-    expect($schema)
-        ->not->toHaveKey('migrations')
-        ->toHaveKey('posts');
+    $tableNames = array_map(fn ($t) => $t->name, $schema->tables);
+    expect($tableNames)
+        ->not->toContain('migrations')
+        ->toContain('posts');
 });
 
 it('reads multiple tables', function (): void {
@@ -93,10 +98,11 @@ it('reads multiple tables', function (): void {
 
     $schema = $this->reader->read();
 
-    expect($schema)
-        ->toHaveKey('users')
-        ->toHaveKey('posts')
-        ->toHaveCount(2);
+    $tableNames = array_map(fn ($t) => $t->name, $schema->tables);
+    expect($tableNames)
+        ->toContain('users')
+        ->toContain('posts')
+        ->and($schema->tables)->toHaveCount(2);
 });
 
 it('excludes all default excluded tables', function (): void {
@@ -115,9 +121,11 @@ it('excludes all default excluded tables', function (): void {
 
     $schema = $this->reader->read();
 
+    $tableNames = array_map(fn ($t) => $t->name, $schema->tables);
+
     foreach ($excludedTables as $table) {
-        expect($schema)->not->toHaveKey($table);
+        expect($tableNames)->not->toContain($table);
     }
 
-    expect($schema)->toHaveKey('products');
+    expect($tableNames)->toContain('products');
 });

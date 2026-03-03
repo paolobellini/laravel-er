@@ -1,10 +1,13 @@
 <?php
 
+use PaoloBellini\LaravelEr\Data\Column;
+use PaoloBellini\LaravelEr\Data\ForeignKey;
+use PaoloBellini\LaravelEr\Data\Index;
 use PaoloBellini\LaravelEr\Support\ColumnAttributes;
 
 it('returns true when column has a unique index', function (): void {
     $indexes = [
-        ['name' => 'users_email_unique', 'columns' => ['email'], 'unique' => true, 'primary' => false],
+        new Index(columns: ['email'], unique: true),
     ];
 
     expect(ColumnAttributes::isUnique('email', $indexes))->toBeTrue();
@@ -12,7 +15,7 @@ it('returns true when column has a unique index', function (): void {
 
 it('returns false when column has no unique index', function (): void {
     $indexes = [
-        ['name' => 'users_name_index', 'columns' => ['name'], 'unique' => false, 'primary' => false],
+        new Index(columns: ['name']),
     ];
 
     expect(ColumnAttributes::isUnique('name', $indexes))->toBeFalse();
@@ -20,7 +23,7 @@ it('returns false when column has no unique index', function (): void {
 
 it('returns the foreign table for a foreign key column', function (): void {
     $foreignKeys = [
-        ['columns' => ['user_id'], 'foreign_table' => 'users', 'foreign_columns' => ['id']],
+        new ForeignKey(columns: ['user_id'], foreignTable: 'users'),
     ];
 
     expect(ColumnAttributes::getForeignTable('user_id', $foreignKeys))->toBe('users');
@@ -28,7 +31,7 @@ it('returns the foreign table for a foreign key column', function (): void {
 
 it('returns null when column is not a foreign key', function (): void {
     $foreignKeys = [
-        ['columns' => ['user_id'], 'foreign_table' => 'users', 'foreign_columns' => ['id']],
+        new ForeignKey(columns: ['user_id'], foreignTable: 'users'),
     ];
 
     expect(ColumnAttributes::getForeignTable('name', $foreignKeys))->toBeNull();
@@ -36,7 +39,7 @@ it('returns null when column is not a foreign key', function (): void {
 
 it('returns false for isNullable when column is not found', function (): void {
     $columns = [
-        ['name' => 'id', 'nullable' => false],
+        new Column('id', 'integer'),
     ];
 
     expect(ColumnAttributes::isNullable('nonexistent', $columns))->toBeFalse();

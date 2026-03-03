@@ -2,12 +2,11 @@
 
 namespace PaoloBellini\LaravelEr\Contracts;
 
+use PaoloBellini\LaravelEr\Data\Schema;
+
 interface SchemaRenderer
 {
-    /**
-     * @param  array<string, array<string, mixed>>  $schema
-     */
-    public function render(array $schema): string;
+    public function render(Schema $schema): string;
 
     public function outputExtension(): string;
 

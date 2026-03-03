@@ -5,13 +5,11 @@ declare(strict_types=1);
 namespace PaoloBellini\LaravelEr\Renderers;
 
 use PaoloBellini\LaravelEr\Contracts\SchemaRenderer;
+use PaoloBellini\LaravelEr\Data\Schema;
 
 final readonly class DbDiagramRenderer implements SchemaRenderer
 {
-    /**
-     * @param  array<string, array<string, mixed>>  $schema
-     */
-    public function render(array $schema): string
+    public function render(Schema $schema): string
     {
         // TODO: Implement render() method.
         return 'dbdiagram path';

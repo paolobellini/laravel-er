@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace PaoloBellini\LaravelEr\Renderers;
 
+use PaoloBellini\LaravelEr\Data\Column;
+use PaoloBellini\LaravelEr\Data\ForeignKey;
+use PaoloBellini\LaravelEr\Data\Table;
 use PaoloBellini\LaravelEr\Support\ColumnAttributes;
 
 final class MermaidRenderer extends AbstractRenderer
 {
-    protected function header(): string
+    protected function renderHeader(): string
     {
         return 'erDiagram';
     }
@@ -23,18 +26,12 @@ final class MermaidRenderer extends AbstractRenderer
         return 'md';
     }
 
-    /**
-     * @param  array{columns: array<int, array<string, mixed>>, foreignKeys: array<int, array<string, mixed>>, indexes: array<int, array<string, mixed>>}  $tableData
-     */
-    protected function renderTable(string $tableName, array $tableData): string
+    protected function renderTable(Table $table): string
     {
-        $indexes = $tableData['indexes'];
-        $foreignKeys = $tableData['foreignKeys'];
+        $lines = [sprintf('    %s {', $table->name)];
 
-        $lines = ["    {$tableName} {"];
-
-        foreach ($tableData['columns'] as $column) {
-            $lines[] = $this->renderColumn($column, $indexes, $foreignKeys);
+        foreach ($table->columns as $column) {
+            $lines[] = $this->renderColumn($column, $table);
         }
 
         $lines[] = '    }';
@@ -42,69 +39,43 @@ final class MermaidRenderer extends AbstractRenderer
         return implode("\n", $lines);
     }
 
-    /**
-     * @param  array<string, mixed>  $column
-     * @param  array<int, array<string, mixed>>  $indexes
-     * @param  array<int, array<string, mixed>>  $foreignKeys
-     */
-    private function renderColumn(array $column, array $indexes, array $foreignKeys): string
+    private function renderColumn(Column $column, Table $table): string
     {
-        /** @var string $name */
-        $name = $column['name'];
-        /** @var string $type */
-        $type = $column['type_name'];
-
         $parts = array_filter([
-            "        {$type} {$name}",
-            $this->columnAttributes($column, $indexes, $foreignKeys),
+            sprintf('        %s %s', $column->typeName, $column->name),
+            $this->columnAttributes($column, $table),
             '"'.$this->columnComment($column).'"',
         ]);
 
         return implode(' ', $parts);
     }
 
-    /**
-     * @param  array<string, mixed>  $column
-     * @param  array<int, array<string, mixed>>  $indexes
-     * @param  array<int, array<string, mixed>>  $foreignKeys
-     */
-    private function columnAttributes(array $column, array $indexes, array $foreignKeys): string
+    private function columnAttributes(Column $column, Table $table): string
     {
         $markers = array_filter([
-            ColumnAttributes::isPrimaryKey($column['name'], $indexes) ? 'PK' : null,
-            ColumnAttributes::isForeignKey($column['name'], $foreignKeys) ? 'FK' : null,
+            ColumnAttributes::isPrimaryKey($column->name, $table->indexes) ? 'PK' : null,
+            ColumnAttributes::isForeignKey($column->name, $table->foreignKeys) ? 'FK' : null,
         ]);
 
         return implode(',', $markers);
     }
 
-    /**
-     * @param  array<string, mixed>  $column
-     */
-    private function columnComment(array $column): string
+    private function columnComment(Column $column): string
     {
-        /** @var bool $nullable */
-        $nullable = $column['nullable'] ?? false;
-
-        return $nullable ? 'nullable' : 'not null';
+        return $column->nullable ? 'nullable' : 'not null';
     }
 
-    /**
-     * @param  array{columns: array<int, array<string, mixed>>, foreignKeys: array<int, array<string, mixed>>, indexes: array<int, array<string, mixed>>}  $tableData
-     * @param  array<string, mixed>  $fk
-     */
-    protected function renderRelationship(string $tableName, array $tableData, array $fk): string
+    protected function renderRelationship(Table $table, ForeignKey $fk): string
     {
-        $foreignTable = $fk['foreign_table'];
-        $fkColumn = $fk['columns'][0];
+        $fkColumn = $fk->columns[0];
 
-        $isNullable = ColumnAttributes::isNullable($fkColumn, $tableData['columns']);
-        $isUnique = ColumnAttributes::isUnique($fkColumn, $tableData['indexes']);
+        $isNullable = ColumnAttributes::isNullable($fkColumn, $table->columns);
+        $isUnique = ColumnAttributes::isUnique($fkColumn, $table->indexes);
 
         $leftSymbol = $isNullable ? 'o|' : '||';
         $rightSymbol = $isUnique ? ($isNullable ? 'o|' : '||') : 'o{';
         $label = $isUnique ? 'has one' : 'has many';
 
-        return "    {$foreignTable} {$leftSymbol}--{$rightSymbol} {$tableName} : \"{$label}\"";
+        return sprintf('    %s %s--%s %s : "%s"', $fk->foreignTable, $leftSymbol, $rightSymbol, $table->name, $label);
     }
 }

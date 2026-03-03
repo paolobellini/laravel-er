@@ -1,5 +1,10 @@
 <?php
 
+use PaoloBellini\LaravelEr\Data\Column;
+use PaoloBellini\LaravelEr\Data\ForeignKey;
+use PaoloBellini\LaravelEr\Data\Index;
+use PaoloBellini\LaravelEr\Data\Schema;
+use PaoloBellini\LaravelEr\Data\Table;
 use PaoloBellini\LaravelEr\Renderers\MermaidRenderer;
 
 beforeEach(function (): void {
@@ -7,23 +12,24 @@ beforeEach(function (): void {
 });
 
 it('renders empty schema with only header', function (): void {
-    expect($this->renderer->render([]))->toBe("erDiagram\n");
+    expect($this->renderer->render(new Schema([])))->toBe("erDiagram\n");
 });
 
 it('renders a single table with columns', function (): void {
-    $schema = [
-        'users' => [
-            'columns' => [
-                ['name' => 'id', 'type_name' => 'integer', 'nullable' => false, 'auto_increment' => true],
-                ['name' => 'name', 'type_name' => 'varchar', 'nullable' => false],
-                ['name' => 'email', 'type_name' => 'varchar', 'nullable' => true],
+    $schema = new Schema([
+        new Table(
+            name: 'users',
+            columns: [
+                new Column('id', 'integer'),
+                new Column('name', 'varchar'),
+                new Column('email', 'varchar', nullable: true),
             ],
-            'foreignKeys' => [],
-            'indexes' => [
-                ['name' => 'users_id_primary', 'columns' => ['id'], 'unique' => true, 'primary' => true],
+            foreignKeys: [],
+            indexes: [
+                new Index(columns: ['id'], primary: true, unique: true),
             ],
-        ],
-    ];
+        ),
+    ]);
 
     $output = $this->renderer->render($schema);
 
@@ -36,21 +42,22 @@ it('renders a single table with columns', function (): void {
 });
 
 it('renders PK and FK markers on columns', function (): void {
-    $schema = [
-        'posts' => [
-            'columns' => [
-                ['name' => 'id', 'type_name' => 'integer', 'nullable' => false],
-                ['name' => 'user_id', 'type_name' => 'integer', 'nullable' => false],
-                ['name' => 'title', 'type_name' => 'varchar', 'nullable' => false],
+    $schema = new Schema([
+        new Table(
+            name: 'posts',
+            columns: [
+                new Column('id', 'integer'),
+                new Column('user_id', 'integer'),
+                new Column('title', 'varchar'),
             ],
-            'foreignKeys' => [
-                ['columns' => ['user_id'], 'foreign_table' => 'users', 'foreign_columns' => ['id'], 'on_update' => 'no action', 'on_delete' => 'no action'],
+            foreignKeys: [
+                new ForeignKey(columns: ['user_id'], foreignTable: 'users'),
             ],
-            'indexes' => [
-                ['name' => 'posts_id_primary', 'columns' => ['id'], 'unique' => true, 'primary' => true],
+            indexes: [
+                new Index(columns: ['id'], primary: true, unique: true),
             ],
-        ],
-    ];
+        ),
+    ]);
 
     $output = $this->renderer->render($schema);
 
@@ -61,29 +68,31 @@ it('renders PK and FK markers on columns', function (): void {
 });
 
 it('renders foreign key relationships', function (): void {
-    $schema = [
-        'users' => [
-            'columns' => [
-                ['name' => 'id', 'type_name' => 'integer', 'nullable' => false],
+    $schema = new Schema([
+        new Table(
+            name: 'users',
+            columns: [
+                new Column('id', 'integer'),
             ],
-            'foreignKeys' => [],
-            'indexes' => [
-                ['name' => 'users_id_primary', 'columns' => ['id'], 'unique' => true, 'primary' => true],
+            foreignKeys: [],
+            indexes: [
+                new Index(columns: ['id'], primary: true, unique: true),
             ],
-        ],
-        'posts' => [
-            'columns' => [
-                ['name' => 'id', 'type_name' => 'integer', 'nullable' => false],
-                ['name' => 'user_id', 'type_name' => 'integer', 'nullable' => false],
+        ),
+        new Table(
+            name: 'posts',
+            columns: [
+                new Column('id', 'integer'),
+                new Column('user_id', 'integer'),
             ],
-            'foreignKeys' => [
-                ['columns' => ['user_id'], 'foreign_table' => 'users', 'foreign_columns' => ['id'], 'on_update' => 'no action', 'on_delete' => 'no action'],
+            foreignKeys: [
+                new ForeignKey(columns: ['user_id'], foreignTable: 'users'),
             ],
-            'indexes' => [
-                ['name' => 'posts_id_primary', 'columns' => ['id'], 'unique' => true, 'primary' => true],
+            indexes: [
+                new Index(columns: ['id'], primary: true, unique: true),
             ],
-        ],
-    ];
+        ),
+    ]);
 
     $output = $this->renderer->render($schema);
 
@@ -91,16 +100,17 @@ it('renders foreign key relationships', function (): void {
 });
 
 it('renders nullable columns correctly', function (): void {
-    $schema = [
-        'profiles' => [
-            'columns' => [
-                ['name' => 'id', 'type_name' => 'integer', 'nullable' => false],
-                ['name' => 'bio', 'type_name' => 'text', 'nullable' => true],
+    $schema = new Schema([
+        new Table(
+            name: 'profiles',
+            columns: [
+                new Column('id', 'integer'),
+                new Column('bio', 'text', nullable: true),
             ],
-            'foreignKeys' => [],
-            'indexes' => [],
-        ],
-    ];
+            foreignKeys: [],
+            indexes: [],
+        ),
+    ]);
 
     $output = $this->renderer->render($schema);
 
