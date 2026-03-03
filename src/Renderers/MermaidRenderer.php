@@ -52,10 +52,12 @@ final class MermaidRenderer extends AbstractRenderer
 
     private function columnAttributes(Column $column, Table $table): string
     {
+        $isPrimaryKey = ColumnAttributes::isPrimaryKey($column->name, $table->indexes);
+
         $markers = array_filter([
-            ColumnAttributes::isPrimaryKey($column->name, $table->indexes) ? 'PK' : null,
+            $isPrimaryKey ? 'PK' : null,
             ColumnAttributes::isForeignKey($column->name, $table->foreignKeys) ? 'FK' : null,
-            ColumnAttributes::isUnique($column->name, $table->indexes) ? 'UK' : null,
+            ! $isPrimaryKey && ColumnAttributes::isUnique($column->name, $table->indexes) ? 'UK' : null,
         ]);
 
         return implode(',', $markers);
