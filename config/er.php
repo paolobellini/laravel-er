@@ -44,6 +44,14 @@ return [
         'job_batches',
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Available Renderers
+    |--------------------------------------------------------------------------
+    |
+    | The format used to produce the diagram
+    |
+    */
     'renderer' => 'mermaid',
     'renderers' => [
         'mermaid' => MermaidRenderer::class,
