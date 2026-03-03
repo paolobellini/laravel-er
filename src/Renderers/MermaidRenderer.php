@@ -65,7 +65,12 @@ final class MermaidRenderer extends AbstractRenderer
 
     private function columnComment(Column $column): string
     {
-        return $column->nullable ? 'nullable' : 'not null';
+        $parts = array_filter([
+            $column->nullable ? 'nullable' : 'not null',
+            ColumnAttributes::hasDefault($column) ? 'default: '.$column->default : null,
+        ]);
+
+        return implode(', ', $parts);
     }
 
     protected function renderRelationship(Table $table, ForeignKey $fk): string

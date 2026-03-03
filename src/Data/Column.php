@@ -9,6 +9,7 @@ final readonly class Column
     public function __construct(
         public string $name,
         public string $typeName,
-        public bool $nullable = false,
+        public bool $nullable,
+        public ?string $default,
     ) {}
 }

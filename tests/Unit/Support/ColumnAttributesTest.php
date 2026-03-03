@@ -37,9 +37,21 @@ it('returns null when column is not a foreign key', function (): void {
     expect(ColumnAttributes::getForeignTable('name', $foreignKeys))->toBeNull();
 });
 
+it('returns true for hasDefault when column has a default value', function (): void {
+    $column = new Column('status', 'string', false, 'active');
+
+    expect(ColumnAttributes::hasDefault($column))->toBeTrue();
+});
+
+it('returns false for hasDefault when column default is null', function (): void {
+    $column = new Column('name', 'string', false, null);
+
+    expect(ColumnAttributes::hasDefault($column))->toBeFalse();
+});
+
 it('returns false for isNullable when column is not found', function (): void {
     $columns = [
-        new Column('id', 'integer'),
+        new Column('id', 'integer', false, null),
     ];
 
     expect(ColumnAttributes::isNullable('nonexistent', $columns))->toBeFalse();

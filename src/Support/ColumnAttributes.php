@@ -66,6 +66,11 @@ final class ColumnAttributes
         return null;
     }
 
+    public static function hasDefault(Column $column): bool
+    {
+        return $column->default !== null;
+    }
+
     /**
      * @param  list<Column>  $columns
      */

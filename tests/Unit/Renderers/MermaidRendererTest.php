@@ -20,9 +20,9 @@ it('renders a single table with columns', function (): void {
         new Table(
             name: 'users',
             columns: [
-                new Column('id', 'integer'),
-                new Column('name', 'varchar'),
-                new Column('email', 'varchar', nullable: true),
+                new Column('id', 'integer', false, null),
+                new Column('name', 'varchar', false, null),
+                new Column('email', 'varchar', true, null),
             ],
             foreignKeys: [],
             indexes: [
@@ -46,9 +46,9 @@ it('renders PK and FK markers on columns', function (): void {
         new Table(
             name: 'posts',
             columns: [
-                new Column('id', 'integer'),
-                new Column('user_id', 'integer'),
-                new Column('title', 'varchar'),
+                new Column('id', 'integer', false, null),
+                new Column('user_id', 'integer', false, null),
+                new Column('title', 'varchar', false, null),
             ],
             foreignKeys: [
                 new ForeignKey(columns: ['user_id'], foreignTable: 'users'),
@@ -72,7 +72,7 @@ it('renders foreign key relationships', function (): void {
         new Table(
             name: 'users',
             columns: [
-                new Column('id', 'integer'),
+                new Column('id', 'integer', false, null),
             ],
             foreignKeys: [],
             indexes: [
@@ -82,8 +82,8 @@ it('renders foreign key relationships', function (): void {
         new Table(
             name: 'posts',
             columns: [
-                new Column('id', 'integer'),
-                new Column('user_id', 'integer'),
+                new Column('id', 'integer', false, null),
+                new Column('user_id', 'integer', false, null),
             ],
             foreignKeys: [
                 new ForeignKey(columns: ['user_id'], foreignTable: 'users'),
@@ -104,8 +104,8 @@ it('renders nullable columns correctly', function (): void {
         new Table(
             name: 'profiles',
             columns: [
-                new Column('id', 'integer'),
-                new Column('bio', 'text', nullable: true),
+                new Column('id', 'integer', false, null),
+                new Column('bio', 'text', true, null),
             ],
             foreignKeys: [],
             indexes: [],
@@ -124,9 +124,9 @@ it('renders UK marker on unique columns', function (): void {
         new Table(
             name: 'users',
             columns: [
-                new Column('id', 'integer'),
-                new Column('email', 'varchar'),
-                new Column('name', 'varchar'),
+                new Column('id', 'integer', false, null),
+                new Column('email', 'varchar', false, null),
+                new Column('name', 'varchar', false, null),
             ],
             foreignKeys: [],
             indexes: [
@@ -144,6 +144,31 @@ it('renders UK marker on unique columns', function (): void {
         ->toContain('varchar name "not null"');
 });
 
+it('renders default value in column comment', function (): void {
+    $schema = new Schema([
+        new Table(
+            name: 'posts',
+            columns: [
+                new Column('id', 'integer', false, null),
+                new Column('status', 'varchar', false, 'draft'),
+                new Column('views', 'integer', false, '0'),
+                new Column('deleted_at', 'timestamp', true, 'NULL'),
+                new Column('title', 'varchar', false, null),
+            ],
+            foreignKeys: [],
+            indexes: [],
+        ),
+    ]);
+
+    $output = $this->renderer->render($schema);
+
+    expect($output)
+        ->toContain('varchar status "not null, default: draft"')
+        ->toContain('integer views "not null, default: 0"')
+        ->toContain('timestamp deleted_at "nullable, default: NULL"')
+        ->toContain('varchar title "not null"');
+});
+
 it('returns markdown wrap output', function (): void {
     expect($this->renderer->wrapOutput("erDiagram\n"))->toBe("```mermaid\nerDiagram\n\n```\n");
 });
@@ -156,19 +181,19 @@ it('renders each table exactly once', function (): void {
     $schema = new Schema([
         new Table(
             name: 'users',
-            columns: [new Column('id', 'integer')],
+            columns: [new Column('id', 'integer', false, null)],
             foreignKeys: [],
             indexes: [],
         ),
         new Table(
             name: 'posts',
-            columns: [new Column('id', 'integer')],
+            columns: [new Column('id', 'integer', false, null)],
             foreignKeys: [],
             indexes: [],
         ),
         new Table(
             name: 'comments',
-            columns: [new Column('id', 'integer')],
+            columns: [new Column('id', 'integer', false, null)],
             foreignKeys: [],
             indexes: [],
         ),
