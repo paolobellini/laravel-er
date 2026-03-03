@@ -26,7 +26,7 @@ final class Context
         /** @var string $outputFilename */
         $outputFilename = config('er.output_filename');
 
-        $filePath = $outputPath.'/'.$outputFilename.'.'.$this->strategy->outputExtension();
+        $filePath = $outputPath.'/'.$outputFilename.'.md';
 
         file_put_contents($filePath, $content);
 

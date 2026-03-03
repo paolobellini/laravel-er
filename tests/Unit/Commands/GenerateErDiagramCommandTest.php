@@ -14,7 +14,6 @@ beforeEach(function (): void {
 
 afterEach(function (): void {
     @unlink(sys_get_temp_dir().'/er-diagram.md');
-    @unlink(sys_get_temp_dir().'/er-diagram.dbml');
 });
 
 it('outputs generating and saved messages', function (): void {

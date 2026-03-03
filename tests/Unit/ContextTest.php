@@ -35,7 +35,7 @@ it('executes strategy for dbdiagram renderer and writes file', function (): void
 
     $result = $this->context->executeStrategy();
 
-    $expectedPath = $this->outputPath.'/er-diagram.dbml';
+    $expectedPath = $this->outputPath.'/er-diagram.md';
 
     expect($result)->toBe($expectedPath)
         ->and(file_exists($expectedPath))->toBeTrue();

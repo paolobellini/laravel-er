@@ -21,11 +21,6 @@ final class MermaidRenderer extends AbstractRenderer
         return "```mermaid\n{$content}\n```\n";
     }
 
-    public function outputExtension(): string
-    {
-        return 'md';
-    }
-
     protected function renderTable(Table $table): string
     {
         $lines = [sprintf('    %s {', $table->name)];

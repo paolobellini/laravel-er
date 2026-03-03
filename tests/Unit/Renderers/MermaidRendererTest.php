@@ -173,10 +173,6 @@ it('returns markdown wrap output', function (): void {
     expect($this->renderer->wrapOutput("erDiagram\n"))->toBe("```mermaid\nerDiagram\n\n```\n");
 });
 
-it('returns md output extension', function (): void {
-    expect($this->renderer->outputExtension())->toBe('md');
-});
-
 it('renders each table exactly once', function (): void {
     $schema = new Schema([
         new Table(

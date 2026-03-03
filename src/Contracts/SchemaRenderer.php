@@ -8,7 +8,5 @@ interface SchemaRenderer
 {
     public function render(Schema $schema): string;
 
-    public function outputExtension(): string;
-
     public function wrapOutput(string $content): string;
 }

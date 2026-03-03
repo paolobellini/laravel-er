@@ -18,11 +18,6 @@ it('renders with default empty header', function (): void {
             return '';
         }
 
-        public function outputExtension(): string
-        {
-            return '';
-        }
-
         public function wrapOutput(string $content): string
         {
             return "---\n{$content}---\n";
@@ -45,11 +40,6 @@ it('returns raw content when wrapOutput is passthrough', function (): void {
         }
 
         protected function renderRelationship(Table $table, ForeignKey $fk): string
-        {
-            return '';
-        }
-
-        public function outputExtension(): string
         {
             return '';
         }
