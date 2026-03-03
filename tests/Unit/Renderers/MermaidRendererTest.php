@@ -206,3 +206,31 @@ it('renders each table exactly once', function (): void {
         ->and(substr_count((string) $output, 'comments {'))->toBe(1)
         ->and(substr_count((string) $output, 'erDiagram'))->toBe(1);
 });
+
+it('sanitizes column types with modifiers for mermaid syntax', function (): void {
+    $schema = new Schema([
+        new Table(
+            name: 'products',
+            columns: [
+                new Column('id', 'integer', false, null),
+                new Column('name', 'varchar(255)', false, null),
+                new Column('views', 'bigint unsigned', false, null),
+                new Column('price', 'decimal(8,2)', false, null),
+                new Column('status', "enum('active','inactive')", false, null),
+            ],
+            foreignKeys: [],
+            indexes: [
+                new Index(columns: ['id'], primary: true, unique: true),
+            ],
+        ),
+    ]);
+
+    $output = $this->renderer->render($schema);
+
+    expect($output)
+        ->toContain('integer id PK "not null"')
+        ->toContain('varchar name "not null, (255)"')
+        ->toContain('bigint views "not null, unsigned"')
+        ->toContain('decimal price "not null, (8,2)"')
+        ->toContain('enum status "not null, values: active,inactive"');
+});

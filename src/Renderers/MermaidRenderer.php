@@ -42,7 +42,7 @@ final class MermaidRenderer extends AbstractRenderer
     private function renderColumn(Column $column, Table $table): string
     {
         $parts = array_filter([
-            sprintf('        %s %s', $column->type, $column->name),
+            sprintf('        %s %s', $this->baseType($column->type), $column->name),
             $this->columnAttributes($column, $table),
             '"'.$this->columnComment($column).'"',
         ]);
@@ -68,9 +68,33 @@ final class MermaidRenderer extends AbstractRenderer
         $parts = array_filter([
             $column->nullable ? 'nullable' : 'not null',
             ColumnAttributes::hasDefault($column) ? 'default: '.$column->default : null,
+            $this->typeDetails($column->type),
         ]);
 
         return implode(', ', $parts);
+    }
+
+    private function baseType(string $type): string
+    {
+        return preg_match('/^\w+/', $type, $m) ? $m[0] : $type;
+    }
+
+    private function typeDetails(string $type): ?string
+    {
+        $rest = substr($type, strlen($this->baseType($type)));
+        $rest = trim($rest);
+        if ($rest === '') {
+            return null;
+        }
+
+        if (str_starts_with($rest, '(') && str_starts_with($type, 'enum')) {
+            $values = trim($rest, '()');
+            $values = str_replace("'", '', $values);
+
+            return 'values: '.$values;
+        }
+
+        return $rest;
     }
 
     protected function renderRelationship(Table $table, ForeignKey $fk): string
