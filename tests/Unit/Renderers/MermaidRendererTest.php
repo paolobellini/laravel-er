@@ -36,7 +36,7 @@ it('renders a single table with columns', function (): void {
     expect($output)
         ->toContain('erDiagram')
         ->toContain('users {')
-        ->toContain('integer id PK "not null"')
+        ->toContain('integer id PK,UK "not null"')
         ->toContain('varchar name "not null"')
         ->toContain('varchar email "nullable"');
 });
@@ -62,7 +62,7 @@ it('renders PK and FK markers on columns', function (): void {
     $output = $this->renderer->render($schema);
 
     expect($output)
-        ->toContain('integer id PK "not null"')
+        ->toContain('integer id PK,UK "not null"')
         ->toContain('integer user_id FK "not null"')
         ->toContain('varchar title "not null"');
 });
@@ -117,6 +117,31 @@ it('renders nullable columns correctly', function (): void {
     expect($output)
         ->toContain('integer id "not null"')
         ->toContain('text bio "nullable"');
+});
+
+it('renders UK marker on unique columns', function (): void {
+    $schema = new Schema([
+        new Table(
+            name: 'users',
+            columns: [
+                new Column('id', 'integer'),
+                new Column('email', 'varchar'),
+                new Column('name', 'varchar'),
+            ],
+            foreignKeys: [],
+            indexes: [
+                new Index(columns: ['id'], primary: true, unique: true),
+                new Index(columns: ['email'], unique: true),
+            ],
+        ),
+    ]);
+
+    $output = $this->renderer->render($schema);
+
+    expect($output)
+        ->toContain('integer id PK,UK "not null"')
+        ->toContain('varchar email UK "not null"')
+        ->toContain('varchar name "not null"');
 });
 
 it('returns markdown wrap output', function (): void {

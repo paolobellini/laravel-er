@@ -55,6 +55,7 @@ final class MermaidRenderer extends AbstractRenderer
         $markers = array_filter([
             ColumnAttributes::isPrimaryKey($column->name, $table->indexes) ? 'PK' : null,
             ColumnAttributes::isForeignKey($column->name, $table->foreignKeys) ? 'FK' : null,
+            ColumnAttributes::isUnique($column->name, $table->indexes) ? 'UK' : null,
         ]);
 
         return implode(',', $markers);
