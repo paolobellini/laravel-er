@@ -25,7 +25,38 @@ it('renders with default empty header', function (): void {
 
         public function wrapOutput(): string
         {
+            return "---\n%s---\n";
+        }
+    };
+
+    $schema = new Schema([
+        new Table('users', [], [], []),
+    ]);
+
+    expect($renderer->render($schema))->toBe("---\nusers\n---\n");
+});
+
+it('returns raw content when wrapOutput is passthrough', function (): void {
+    $renderer = new class extends AbstractRenderer
+    {
+        protected function renderTable(Table $table): string
+        {
+            return $table->name;
+        }
+
+        protected function renderRelationship(Table $table, ForeignKey $fk): string
+        {
             return '';
+        }
+
+        public function outputExtension(): string
+        {
+            return '';
+        }
+
+        public function wrapOutput(): string
+        {
+            return '%s';
         }
     };
 

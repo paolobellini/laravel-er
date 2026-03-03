@@ -12,18 +12,16 @@ final readonly class DbDiagramRenderer implements SchemaRenderer
     public function render(Schema $schema): string
     {
         // TODO: Implement render() method.
-        return 'dbdiagram path';
+        return sprintf($this->wrapOutput(), '');
     }
 
     public function wrapOutput(): string
     {
-        // TODO: Implement wrapOutput() method.
-        return 'dbdiagram wrap';
+        return '%s';
     }
 
     public function outputExtension(): string
     {
-        // TODO: Implement outputExtension() method.
-        return 'dbdiagram extension';
+        return 'dbml';
     }
 }

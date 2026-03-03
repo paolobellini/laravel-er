@@ -8,13 +8,13 @@ beforeEach(function (): void {
 });
 
 it('renders empty string', function (): void {
-    expect($this->renderer->render(new Schema([])))->toBe('dbdiagram path');
+    expect($this->renderer->render(new Schema([])))->toBe('');
 });
 
-it('returns empty wrap output', function (): void {
-    expect($this->renderer->wrapOutput())->toBe('dbdiagram wrap');
+it('returns passthrough wrap output', function (): void {
+    expect($this->renderer->wrapOutput())->toBe('%s');
 });
 
-it('returns empty output extension', function (): void {
-    expect($this->renderer->outputExtension())->toBe('dbdiagram extension');
+it('returns dbml output extension', function (): void {
+    expect($this->renderer->outputExtension())->toBe('dbml');
 });

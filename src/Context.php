@@ -19,6 +19,17 @@ final class Context
     {
         $schema = $this->reader->read();
 
-        return $this->strategy->render($schema);
+        $content = $this->strategy->render($schema);
+
+        /** @var string $outputPath */
+        $outputPath = config('er.output_path');
+        /** @var string $outputFilename */
+        $outputFilename = config('er.output_filename');
+
+        $filePath = $outputPath.'/'.$outputFilename.'.'.$this->strategy->outputExtension();
+
+        file_put_contents($filePath, $content);
+
+        return $filePath;
     }
 }

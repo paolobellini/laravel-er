@@ -8,6 +8,13 @@ beforeEach(function (): void {
         'driver' => 'sqlite',
         'database' => ':memory:',
     ]);
+    $this->app['config']->set('er.output_path', sys_get_temp_dir());
+    $this->app['config']->set('er.output_filename', 'er-diagram');
+});
+
+afterEach(function (): void {
+    @unlink(sys_get_temp_dir().'/er-diagram.md');
+    @unlink(sys_get_temp_dir().'/er-diagram.dbml');
 });
 
 it('outputs generating and saved messages', function (): void {

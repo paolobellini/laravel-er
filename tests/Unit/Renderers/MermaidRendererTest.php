@@ -12,7 +12,7 @@ beforeEach(function (): void {
 });
 
 it('renders empty schema with only header', function (): void {
-    expect($this->renderer->render(new Schema([])))->toBe("erDiagram\n");
+    expect($this->renderer->render(new Schema([])))->toBe("```mermaid\nerDiagram\n\n```\n");
 });
 
 it('renders a single table with columns', function (): void {
