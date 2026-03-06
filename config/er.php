@@ -1,5 +1,8 @@
 <?php
 
+use PaoloBellini\LaravelEr\Renderers\DbDiagramRenderer;
+use PaoloBellini\LaravelEr\Renderers\MermaidRenderer;
+
 return [
 
     /*
@@ -11,6 +14,16 @@ return [
     |
     */
     'output_path' => base_path(),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Output Filename
+    |--------------------------------------------------------------------------
+    |
+    | The name of the generated file (without extension).
+    |
+    */
+    'output_filename' => 'er-diagram',
 
     /*
     |--------------------------------------------------------------------------
@@ -31,4 +44,17 @@ return [
         'job_batches',
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Available Renderers
+    |--------------------------------------------------------------------------
+    |
+    | The format used to produce the diagram
+    |
+    */
+    'renderer' => 'mermaid',
+    'renderers' => [
+        'mermaid' => MermaidRenderer::class,
+        'dbdiagram' => DbDiagramRenderer::class,
+    ],
 ];
