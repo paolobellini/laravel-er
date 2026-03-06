@@ -1,6 +1,8 @@
 /vendor/
 .phpunit.cache/
+.phpunit.result.cache
 .idea/
 .vscode/
 *.swp
 composer.lock
+.DS_Store
