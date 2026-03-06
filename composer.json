@@ -3,7 +3,7 @@
     "description": "Automatically generate ER diagrams and AI-ready schema documentation from your Laravel database and Eloquent models.",
     "require": {
         "php": "^8.2",
-        "illuminate/support": "^11.0|^12.0"
+        "illuminate/support": "^12.0"
     },
     "require-dev": {
         "laravel/pint": "^1.27.1",
