@@ -1,6 +1,17 @@
 {
     "name": "paolobellini/laravel-er",
     "description": "Automatically generate ER diagrams and AI-ready schema documentation from your Laravel database and Eloquent models.",
+    "keywords": [
+        "laravel",
+        "er-diagram",
+        "mermaid",
+        "dbdiagram",
+        "schema",
+        "database",
+        "documentation",
+        "ai-context"
+    ],
+    "homepage": "https://github.com/paolobellini/laravel-er",
     "require": {
         "php": "^8.2",
         "illuminate/support": "^12.0"
@@ -28,9 +39,14 @@
     "authors": [
         {
             "name": "Paolo Bellini",
-            "email": "paolo@bellini.one"
+            "email": "paolo@bellini.one",
+            "homepage": "https://bellini.one"
         }
     ],
+    "support": {
+        "issues": "https://github.com/paolobellini/laravel-er/issues",
+        "source": "https://github.com/paolobellini/laravel-er"
+    },
     "extra": {
         "laravel": {
             "providers": [
