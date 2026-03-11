@@ -34,7 +34,7 @@ final class DbDiagramRenderer extends AbstractRenderer
         $attributes = $this->columnAttributes($column, $table);
         $attributePart = $attributes !== [] ? ' ['.implode(', ', $attributes).']' : '';
 
-        return sprintf('  %s %s%s', $column->name, $column->type, $attributePart);
+        return sprintf('  %s %s%s', $column->name, $this->displayType($column->type), $attributePart);
     }
 
     /**
@@ -49,7 +49,20 @@ final class DbDiagramRenderer extends AbstractRenderer
             $column->nullable ? 'null' : 'not null',
             ! $isPrimaryKey && ColumnAttributes::isUnique($column->name, $table->indexes) ? 'unique' : null,
             ColumnAttributes::hasDefault($column) ? sprintf("default: '%s'", $column->default) : null,
+            $this->typeModifier($column->type) !== null ? sprintf("note: '%s'", $this->typeModifier($column->type)) : null,
         ]));
+    }
+
+    private function displayType(string $type): string
+    {
+        return preg_match('/^\w+(\([^)]*\))?/', $type, $m) ? $m[0] : $type;
+    }
+
+    private function typeModifier(string $type): ?string
+    {
+        $rest = trim(substr($type, strlen($this->displayType($type))));
+
+        return $rest !== '' ? $rest : null;
     }
 
     protected function renderRelationship(Table $table, ForeignKey $fk): string
