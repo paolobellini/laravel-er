@@ -201,6 +201,34 @@ it('renders each table exactly once', function (): void {
         ->and(substr_count((string) $output, 'Table comments {'))->toBe(1);
 });
 
+it('renders type details in note attribute', function (): void {
+    $schema = new Schema([
+        new Table(
+            name: 'products',
+            columns: [
+                new Column('id', 'integer', false, null),
+                new Column('name', 'varchar(255)', false, null),
+                new Column('views', 'bigint unsigned', false, null),
+                new Column('price', 'decimal(8,2)', false, null),
+                new Column('status', "enum('active','inactive')", false, null),
+            ],
+            foreignKeys: [],
+            indexes: [
+                new Index(columns: ['id'], primary: true, unique: true),
+            ],
+        ),
+    ]);
+
+    $output = $this->renderer->render($schema);
+
+    expect($output)
+        ->toContain('  id integer [primary key, not null]')
+        ->toContain('  name varchar(255) [not null]')
+        ->toContain("  views bigint [not null, note: 'unsigned']")
+        ->toContain('  price decimal(8,2) [not null]')
+        ->toContain("  status enum('active','inactive') [not null]");
+});
+
 it('renders one-to-one relationship when FK is unique', function (): void {
     $schema = new Schema([
         new Table(

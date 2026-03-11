@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/), and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.0.1] - 2026-03-11
+
+### Added
+- Fenced code block wrapping for dbdiagram renderer output
+
+### Changed
+- dbdiagram renderer now keeps length and precision with the column type (e.g. `varchar(255)`, `decimal(8,2)`) and moves word modifiers like `unsigned` to a `note:` attribute
+
 ## [1.0.0] - 2026-03-06
 
 ### Added
