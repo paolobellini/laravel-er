@@ -12,11 +12,11 @@ beforeEach(function (): void {
 });
 
 it('renders empty schema', function (): void {
-    expect($this->renderer->render(new Schema([])))->toBe("\n");
+    expect($this->renderer->render(new Schema([])))->toBe("```dbdiagram\n\n\n```\n");
 });
 
 it('returns passthrough wrap output', function (): void {
-    expect($this->renderer->wrapOutput('test'))->toBe('test');
+    expect($this->renderer->wrapOutput('test'))->toBe("```dbdiagram\ntest\n```\n");
 });
 
 it('renders a single table with columns', function (): void {
