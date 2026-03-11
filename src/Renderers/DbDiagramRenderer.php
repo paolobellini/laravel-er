@@ -13,7 +13,7 @@ final class DbDiagramRenderer extends AbstractRenderer
 {
     public function wrapOutput(string $content): string
     {
-        return $content;
+        return "```dbdiagram\n{$content}\n```\n";
     }
 
     protected function renderTable(Table $table): string
